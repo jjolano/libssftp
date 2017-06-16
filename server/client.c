@@ -295,7 +295,7 @@ void ftpclient_event(struct FTPClient* client, int sock)
 		char* name;
 		char* args;
 
-		string_parsecmd(name, args, client->buf);
+		string_parsecmd(&name, &args, client->buf);
 
 		if(!ftpcmd_call(client->server->commands, false, client, name, args))
 		{

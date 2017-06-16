@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "cmd.h"
 #include "util/pt.h"
@@ -79,31 +80,15 @@ void string_toupper(char* dst, const char* src)
 	*dst = '\0';
 }
 
-void string_parsecmd(char* name, char* args, char* src)
+void string_parsecmd(char** name, char** args, char* src)
 {
-	char* buf = name;
-	bool upper = true;
+	*args = strchr(src, ' ');
 
-	while(*src != '\0')
+	if(*args != NULL)
 	{
-		if(upper)
-		{
-			if(*src != ' ')
-			{
-				*(buf++) = toupper(*(src++));
-			}
-			else
-			{
-				*buf = '\0';
-				upper = false;
-				++src;
-			}
-		}
-		else
-		{
-			*(buf++) = *(src++);
-		}
+		**args = '\0';
+		++*args;
 	}
 
-	*buf = '\0';
+	string_toupper(*name, src);
 }

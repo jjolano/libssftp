@@ -25,7 +25,7 @@ bool ftpcmd_call(struct FTPCommand*, bool, struct FTPClient*, const char*, const
 void ftpcmd_destroy(struct FTPCommand*);
 
 void string_toupper(char*, const char*);
-void string_parsecmd(char*, char*, char*);
+void string_parsecmd(char**, char**, char*);
 
 #ifdef __cplusplus
 }
