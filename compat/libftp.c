@@ -8,7 +8,7 @@
 #include "server/client.h"
 
 #ifdef __CELLOS_PRX__
-
+#include "compat/cellos_prx/vsh/include/sys_prx_for_user.h"
 #else
 #include <cell/sysmodule.h>
 #endif
