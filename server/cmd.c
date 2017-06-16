@@ -7,7 +7,7 @@
 #include "util/pt.h"
 
 #ifdef __CELLOS_PRX__
-
+#include "compat/cellos_prx/vsh/include/stdc.h"
 #endif
 
 void ftpcmd_create(struct FTPCommand* command)

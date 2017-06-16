@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include "pt.h"
 
+#ifdef __CELLOS_PRX__
+#include "compat/cellos_prx/vsh/include/allocator.h"
+#include "compat/cellos_prx/vsh/include/stdc.h"
+#endif
+
 struct PTTree* pttree_create(void)
 {
 	struct PTTree* t = malloc(sizeof(struct PTTree));

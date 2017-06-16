@@ -7,6 +7,11 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __CELLOS_PRX__
+#include "compat/cellos_prx/vsh/include/allocator.h"
+#include "compat/cellos_prx/vsh/include/stdc.h"
+#endif
+
 #define array_add(array_ptr, count) \
 ({ \
 	*array_ptr = realloc(*array_ptr, sizeof(typeof(*array_ptr)) * count); \

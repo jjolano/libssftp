@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include "avl.h"
 
+#ifdef __CELLOS_PRX__
+#include "compat/cellos_prx/vsh/include/allocator.h"
+#include "compat/cellos_prx/vsh/include/stdc.h"
+#endif
+
 struct AVLTree* avltree_create(void)
 {
 	struct AVLTree* t = malloc(sizeof(struct AVLTree));
