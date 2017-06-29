@@ -1,4 +1,4 @@
 TYPE ?= posix
-LIBNAME = libssftp_$(TYPE)
+LIBNAME = ssftp_$(TYPE)
 
 include mk/$(TYPE).mk

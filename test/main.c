@@ -8,7 +8,7 @@ int main(void)
 
 	ftpcmd_create(&commands);
 
-	int sock = ftpserv_create(&server, 21, &commands);
+	ftpserv_create(&server, 21, &commands);
 
 	ftpserv_run(&server);
 	ftpserv_destroy(&server);
