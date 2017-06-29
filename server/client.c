@@ -10,8 +10,11 @@
 #include <unistd.h>
 
 #include "client.h"
+#include "fs.h"
 #include "util/array.h"
 #include "util/avl.h"
+
+array(struct pollfd, pollfd_);
 
 #ifdef __CELLOS_LV2__
 #include "compat/cellos_lv2.h"
@@ -23,7 +26,7 @@
 #include "compat/cellos_prx/vsh/include/sys_net.h"
 #endif
 
-struct FTPClient* ftpclient_create(int sock, struct FTPServer* server, char* buf, int bufsiz, struct sockaddr* addr, socklen_t addrlen)
+struct FTPClient* ftpclient_create(int sock, struct FTPServer* server, char* buf, int bufsiz)
 {
 	struct FTPClient* client = malloc(sizeof(struct FTPClient));
 
@@ -35,17 +38,15 @@ struct FTPClient* ftpclient_create(int sock, struct FTPServer* server, char* buf
 		client->sock_data = -1;
 		client->sock_pasv = -1;
 
-		client->addr = malloc(sizeof(struct sockaddr));
-		memcpy(client->addr, addr, addrlen);
-		client->addrlen = addrlen;
+		client->addrlen = sizeof(struct sockaddr);
+		getsockname(sock, &client->addr, &client->addrlen);
 
 		client->buf = buf;
 		client->bufsiz = bufsiz;
 
 		client->data_callback = NULL;
 
-		client->fp = NULL;
-		client->dirp = NULL;
+		client->handle = NULL;
 
 		client->cwd[0] = '\0';
 		client->username[0] = '\0';
@@ -97,7 +98,7 @@ bool ftpclient_data_start(struct FTPClient* client, void (*callback)(struct FTPC
 		{
 			// no pasv listener, attempt actv mode
 			// only connect to originating point
-			struct sockaddr_in* sin_addr = (struct sockaddr_in*) client->addr;
+			struct sockaddr_in* sin_addr = (struct sockaddr_in*) &client->addr;
 			struct sockaddr_in actv_addr;
 
 			memcpy(&actv_addr, sin_addr, client->addrlen);
@@ -168,7 +169,7 @@ bool ftpclient_data_start(struct FTPClient* client, void (*callback)(struct FTPC
 	}
 
 	// enable event polling on data connection
-	struct pollfd* fd = array_add(&client->server->fds, client->server->nfds);
+	struct pollfd* fd = pollfd_array_add(&client->server->fds, client->server->nfds);
 
 	if(fd != NULL)
 	{
@@ -195,16 +196,18 @@ void ftpclient_data_end(struct FTPClient* client)
 {
 	if(client->sock_data != -1)
 	{
-		if(client->fp != NULL)
+		if(client->handle != NULL)
 		{
-			fclose(client->fp);
-			client->fp = NULL;
-		}
+			if(client->handle->_dir)
+			{
+				ssftpFsClosedir(client->handle);
+			}
+			else
+			{
+				ssftpFsClose(client->handle);
+			}
 
-		if(client->dirp != NULL)
-		{
-			closedir(client->dirp);
-			client->dirp = NULL;
+			client->handle = NULL;
 		}
 
 		ftpclient_disconnect(client, client->sock_data);
@@ -289,6 +292,7 @@ void ftpclient_event(struct FTPClient* client, int sock)
 		{
 			// invalid data
 			ftpclient_disconnect(client, sock);
+			ftpclient_destroy(client, false);
 			return;
 		}
 
@@ -326,7 +330,7 @@ void ftpclient_disconnect(struct FTPClient* client, int sock)
 
 		if(pfd->fd == sock)
 		{
-			array_remove(&client->server->fds, i, client->server->nfds--);
+			pollfd_array_remove(&client->server->fds, i, client->server->nfds--);
 			break;
 		}
 	}
@@ -336,25 +340,38 @@ void ftpclient_disconnect(struct FTPClient* client, int sock)
 
 void ftpclient_destroy(struct FTPClient* client, bool freebuf)
 {
-	close(client->sock_control);
-	close(client->sock_data);
-	close(client->sock_pasv);
+	if(client->sock_control != -1)
+	{
+		close(client->sock_control);
+	}
 
-	free(client->addr);
+	if(client->sock_data != -1)
+	{
+		close(client->sock_data);
+	}
+
+	if(client->sock_pasv != -1)
+	{
+		close(client->sock_pasv);
+	}
 
 	if(freebuf)
 	{
 		free(client->buf);
 	}
 
-	if(client->fp != NULL)
+	if(client->handle != NULL)
 	{
-		fclose(client->fp);
-	}
+		if(client->handle->_dir)
+		{
+			ssftpFsClosedir(client->handle);
+		}
+		else
+		{
+			ssftpFsClose(client->handle);
+		}
 
-	if(client->dirp != NULL)
-	{
-		closedir(client->dirp);
+		client->handle = NULL;
 	}
 
 	free(client->rnfr);

@@ -10,6 +10,10 @@
 #include "server.h"
 #include "util/array.h"
 
+array(struct pollfd, pollfd_);
+array(ftpclient_event_connect, connect_);
+array(ftpclient_event_disconnect, disconnect_);
+
 #ifdef __CELLOS_LV2__
 #include "compat/cellos_lv2.h"
 #endif
@@ -68,12 +72,12 @@ int ftpserv_run(struct FTPServer* server)
 
 	server->stop = false;
 
-	struct pollfd* fd = array_add(&server->fds, server->nfds);
+	struct pollfd* spfd = pollfd_array_add(&server->fds, server->nfds);
 
-	if(fd != NULL)
+	if(spfd != NULL)
 	{
-		fd->fd = server->sock;
-		fd->events = POLLIN;
+		spfd->fd = server->sock;
+		spfd->events = POLLIN;
 
 		++server->nfds;
 	}
@@ -125,17 +129,14 @@ int ftpserv_run(struct FTPServer* server)
 				if(pfd->revents & POLLNVAL)
 				{
 					// remove invalid socket
-					array_remove(&server->fds, i, server->nfds--);
+					pollfd_array_remove(&server->fds, i, server->nfds--);
 					continue;
 				}
 
 				if(pfd->fd == server->sock)
 				{
 					// new control connection
-					struct sockaddr addr;
-					socklen_t addrlen;
-
-					int sock = accept(server->sock, &addr, &addrlen);
+					int sock = accept(server->sock, NULL, NULL);
 
 					if(sock == -1)
 					{
@@ -149,16 +150,16 @@ int ftpserv_run(struct FTPServer* server)
 					setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
 
 					// initialize client
-					struct FTPClient* client = ftpclient_create(sock, server, server->buf, server->bufsiz, &addr, addrlen);
+					struct FTPClient* client = ftpclient_create(sock, server, server->buf, server->bufsiz);
 
 					if(client != NULL)
 					{
-						struct pollfd* fd = array_add(&server->fds, server->nfds);
+						struct pollfd* cpfd = pollfd_array_add(&server->fds, server->nfds);
 
-						if(fd != NULL)
+						if(cpfd != NULL)
 						{
-							fd->fd = sock;
-							fd->events = POLLIN;
+							cpfd->fd = sock;
+							cpfd->events = POLLIN;
 
 							++server->nfds;
 
@@ -191,7 +192,7 @@ int ftpserv_run(struct FTPServer* server)
 					{
 						// orphan socket
 						close(pfd->fd);
-						array_remove(&server->fds, i, server->nfds--);
+						pollfd_array_remove(&server->fds, i, server->nfds--);
 						continue;
 					}
 
@@ -263,8 +264,11 @@ void ftpserv_stop(struct FTPServer* server)
 
 void ftpserv_destroy(struct FTPServer* server)
 {
-	close(server->sock);
-	server->sock = -1;
+	if(server->sock != -1)
+	{
+		close(server->sock);
+		server->sock = -1;
+	}
 
 	free(server->buf);
 	free(server->fds);
@@ -277,7 +281,7 @@ void ftpserv_destroy(struct FTPServer* server)
 
 void ftpserv_event_connect_register(struct FTPServer* server, ftpclient_event_connect callback)
 {
-	ftpclient_event_connect* connect_callback = array_add(&server->connect_callbacks, server->nconnect_callbacks + 1);
+	ftpclient_event_connect* connect_callback = connect_array_add(&server->connect_callbacks, server->nconnect_callbacks + 1);
 
 	if(connect_callback != NULL)
 	{
@@ -294,7 +298,7 @@ void ftpserv_event_connect_unregister(struct FTPServer* server, ftpclient_event_
 	{
 		if(server->connect_callbacks[n] == callback)
 		{
-			array_remove(&server->connect_callbacks, n, --server->nconnect_callbacks);
+			connect_array_remove(&server->connect_callbacks, n, --server->nconnect_callbacks);
 			break;
 		}
 	}
@@ -312,7 +316,7 @@ void ftpserv_event_connect_call(struct FTPServer* server, struct FTPClient* clie
 
 void ftpserv_event_disconnect_register(struct FTPServer* server, ftpclient_event_disconnect callback)
 {
-	ftpclient_event_disconnect* disconnect_callback = array_add(&server->disconnect_callbacks, server->ndisconnect_callbacks + 1);
+	ftpclient_event_disconnect* disconnect_callback = disconnect_array_add(&server->disconnect_callbacks, server->ndisconnect_callbacks + 1);
 
 	if(disconnect_callback != NULL)
 	{
@@ -329,7 +333,7 @@ void ftpserv_event_disconnect_unregister(struct FTPServer* server, ftpclient_eve
 	{
 		if(server->disconnect_callbacks[n] == callback)
 		{
-			array_remove(&server->disconnect_callbacks, n, --server->ndisconnect_callbacks);
+			disconnect_array_remove(&server->disconnect_callbacks, n, --server->ndisconnect_callbacks);
 			break;
 		}
 	}

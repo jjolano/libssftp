@@ -22,6 +22,7 @@ extern "C" {
 struct FTPServer;
 
 #include "server.h"
+#include "fs.h"
 
 struct FTPClient;
 
@@ -33,7 +34,7 @@ struct FTPClient
 	int sock_data;
 	int sock_pasv;
 
-	struct sockaddr* addr;
+	struct sockaddr addr;
 	socklen_t addrlen;
 
 	char* buf;
@@ -42,8 +43,7 @@ struct FTPClient
 	void (*data_callback)(struct FTPClient*);
 
 	// ftp variables
-	FILE* fp;
-	DIR* dirp;
+	struct FTPFileHandle* handle;
 
 	char cwd[PATH_MAX];
 	char username[32];
@@ -53,7 +53,7 @@ struct FTPClient
 	bool authorized;
 };
 
-struct FTPClient* ftpclient_create(int, struct FTPServer*, char*, int, struct sockaddr*, socklen_t);
+struct FTPClient* ftpclient_create(int, struct FTPServer*, char*, int);
 
 void ftpclient_send_message(struct FTPClient*, int, bool, const char*);
 

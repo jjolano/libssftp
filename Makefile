@@ -1,4 +1,4 @@
-LIBNAME = libssftp
-TYPE ?= linux
+TYPE ?= posix
+LIBNAME = libssftp_$(TYPE)
 
-include $(TYPE).mk
+include mk/$(TYPE).mk

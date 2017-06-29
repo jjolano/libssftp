@@ -12,23 +12,17 @@ extern "C" {
 #include "compat/cellos_prx/vsh/include/stdc.h"
 #endif
 
-#define array_add(array_ptr, count) \
-({ \
-	*array_ptr = realloc(*array_ptr, sizeof(typeof(*array_ptr)) * count); \
-	array_ptr[count]; \
-})
-
-#define array_remove(array_ptr, index, count) \
-({ \
-	*array_ptr[index] = *array_ptr[count - 1]; \
-	*array_ptr = realloc(*array_ptr, sizeof(typeof(*array_ptr)) * (count - 1)); \
-})
-
-#define array_remove_ordered(array_ptr, index, count) \
-({ \
-	memmove(&array_ptr[index], &array_ptr[index + 1], sizeof(typeof(*array_ptr)) * (count - index - 1)); \
-	*array_ptr = realloc(*array_ptr, sizeof(typeof(*array_ptr)) * (count - 1)); \
-})
+#define array(type, prefix) \
+inline type* prefix##array_add(type** array_ptr, size_t count) \
+{ \
+	*array_ptr = realloc(*array_ptr, sizeof(type) * (count + 1)); \
+	return &((*array_ptr)[count]); \
+} \
+inline void prefix##array_remove(type** array_ptr, size_t index, size_t count) \
+{ \
+	(*array_ptr)[index] = (*array_ptr)[count - 1]; \
+	*array_ptr = realloc(*array_ptr, sizeof(type) * (count - 1)); \
+}
 
 #ifdef __cplusplus
 }
