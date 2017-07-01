@@ -13,16 +13,18 @@ extern "C" {
 #ifdef __CELLOS_LV2__
 #include <sys/fs_external.h>
 #define PATH_MAX (CELL_FS_MAX_MP_LENGTH + CELL_FS_MAX_FS_PATH_LENGTH + 1)
-#else
+#endif
+
+#ifdef __linux__
 #include <linux/limits.h>
-#define ftell(a) ftello(a)
-#define fseek(a) fseeko(a)
+#else
+#include <limits.h>
 #endif
 
 struct FTPServer;
 
 #include "server.h"
-#include "fs.h"
+#include "compat/fs.h"
 
 struct FTPClient;
 

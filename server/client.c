@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #include "client.h"
-#include "fs.h"
+#include "compat/fs.h"
 #include "util/array.h"
 #include "util/avl.h"
 
@@ -140,7 +140,7 @@ bool ftpclient_data_start(struct FTPClient* client, void (*callback)(struct FTPC
 				client->sock_data = accept(client->sock_pasv, NULL, NULL);
 			}
 
-			close(client->sock_pasv);
+			ftpclient_disconnect(client, client->sock_pasv);
 			client->sock_pasv = -1;
 
 			if(p <= 0 || client->sock_data == -1)
@@ -169,12 +169,12 @@ bool ftpclient_data_start(struct FTPClient* client, void (*callback)(struct FTPC
 	}
 
 	// enable event polling on data connection
-	struct pollfd* fd = pollfd_array_add(&client->server->fds, client->server->nfds);
+	struct pollfd* dpfd = pollfd_array_add(&client->server->fds, client->server->nfds);
 
-	if(fd != NULL)
+	if(dpfd != NULL)
 	{
-		fd->fd = client->sock_data;
-		fd->events = events;
+		dpfd->fd = client->sock_data;
+		dpfd->events = events;
 
 		++client->server->nfds;
 
@@ -232,7 +232,7 @@ bool ftpclient_data_pasv(struct FTPClient* client)
 
 	if(client->sock_pasv != -1)
 	{
-		close(client->sock_pasv);
+		ftpclient_disconnect(client, client->sock_pasv);
 		client->sock_pasv = -1;
 	}
 
@@ -263,6 +263,20 @@ bool ftpclient_data_pasv(struct FTPClient* client)
 	listen(sock, 1);
 
 	client->sock_pasv = sock;
+
+	// enable event polling on pasv
+	struct pollfd* ppfd = pollfd_array_add(&client->server->fds, client->server->nfds);
+
+	if(ppfd != NULL)
+	{
+		ppfd->fd = client->sock_pasv;
+		ppfd->events = POLLIN;
+
+		++client->server->nfds;
+
+		avltree_insert(client->server->clients, client->sock_pasv, client);
+	}
+
 	return true;
 }
 
@@ -307,6 +321,17 @@ void ftpclient_event(struct FTPClient* client, int sock)
 		{
 			ftpclient_send_message(client, 502, false, "Command not implemented.");
 		}
+	}
+
+	if(sock == client->sock_pasv)
+	{
+		if(client->sock_data == -1)
+		{
+			client->sock_data = accept(client->sock_pasv, NULL, NULL);
+		}
+
+		ftpclient_disconnect(client, client->sock_pasv);
+		client->sock_pasv = -1;
 	}
 }
 

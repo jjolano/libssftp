@@ -1,25 +1,26 @@
 TARGET = lib$(LIBNAME).a
 
-MACH = $(shell uname -m)
+MACH := $(shell uname -m)
 
-CFILES = $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c)
+CFILES = $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c) compat/fs/$(TYPE).c
 OFILES = $(CFILES:.c=.$(MACH).o)
 
 LIBS = -l$(LIBNAME)
 LIBPATH = -L.
 INCLUDE = -I.
-CFLAGS = -Og -g -Wall -ffunction-sections -fdata-sections -fno-builtin-printf
+CFLAGS = -Og -g -Wall -ffunction-sections -fdata-sections
+CFLAGS += -D_FILE_OFFSET_BITS=64
 
 all: $(TARGET)
 
 test.elf: all
-	$(CC) $(INCLUDE) $(LIBPATH) $(LIBS) $(CFLAGS) -o $@ test/main.c
+	$(CC) $(INCLUDE) $(LIBPATH) $(CFLAGS) -o $@ test/main.c $(LIBS)
 
 clean:
 	rm -f $(TARGET) $(OFILES) test.elf
 
 %.$(MACH).o: %.c
-	$(CC) $(INCLUDE) -c -o $@ $< $(CFLAGS)
+	$(CC) $(INCLUDE) $(CFLAGS) -c -o $@ $<
 
 $(TARGET): $(OFILES)
 	$(AR) rcs $@ $^
