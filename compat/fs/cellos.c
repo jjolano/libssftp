@@ -1,5 +1,10 @@
+#include <stdlib.h>
 #include <cell/cell_fs.h>
 #include "compat/fs.h"
+
+#ifdef __CELLOS_PRX__
+#include "compat/cellos_prx/vsh/include/allocator.h"
+#endif
 
 struct FTPFileHandle* __attribute__((weak)) ssftpFsOpen(const char* path, int oflags, mode_t mode)
 {
@@ -35,7 +40,6 @@ int __attribute__((weak)) ssftpFsClosedir(struct FTPFileHandle* handle)
 {
 
 }
-
 
 int __attribute__((weak)) ssftpFsStat(const char* path, struct stat* buf)
 {
@@ -80,4 +84,9 @@ int __attribute__((weak)) ssftpFsFtruncate(struct FTPFileHandle* handle, off_t l
 int __attribute__((weak)) ssftpFsChmod(const char* path, mode_t mode)
 {
 
+}
+
+int __attribute__((weak)) ssftpFsLseek(struct FTPFileHandle* handle, off_t offset, int whence)
+{
+	
 }
