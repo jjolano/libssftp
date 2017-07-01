@@ -48,7 +48,7 @@ struct FTPClient* ftpclient_create(int sock, struct FTPServer* server, char* buf
 
 		client->handle = NULL;
 
-		client->cwd[0] = '\0';
+		strcpy(client->cwd, "/");
 		client->username[0] = '\0';
 		client->rest = 0;
 		client->rnfr = NULL;
