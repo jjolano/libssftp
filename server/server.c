@@ -281,7 +281,7 @@ void ftpserv_destroy(struct FTPServer* server)
 
 void ftpserv_event_connect_register(struct FTPServer* server, ftpclient_event_connect callback)
 {
-	ftpclient_event_connect* connect_callback = connect_array_add(&server->connect_callbacks, server->nconnect_callbacks + 1);
+	ftpclient_event_connect* connect_callback = connect_array_add(&server->connect_callbacks, server->nconnect_callbacks);
 
 	if(connect_callback != NULL)
 	{
@@ -316,7 +316,7 @@ void ftpserv_event_connect_call(struct FTPServer* server, struct FTPClient* clie
 
 void ftpserv_event_disconnect_register(struct FTPServer* server, ftpclient_event_disconnect callback)
 {
-	ftpclient_event_disconnect* disconnect_callback = disconnect_array_add(&server->disconnect_callbacks, server->ndisconnect_callbacks + 1);
+	ftpclient_event_disconnect* disconnect_callback = disconnect_array_add(&server->disconnect_callbacks, server->ndisconnect_callbacks);
 
 	if(disconnect_callback != NULL)
 	{

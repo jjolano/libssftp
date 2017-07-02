@@ -296,7 +296,7 @@ void ftpclient_event(struct FTPClient* client, int sock)
 			ftpclient_data_end(client);
 		}
 	}
-
+	else
 	if(sock == client->sock_control)
 	{
 		// receive data from control socket
@@ -306,7 +306,6 @@ void ftpclient_event(struct FTPClient* client, int sock)
 		{
 			// invalid data
 			ftpclient_disconnect(client, sock);
-			ftpclient_destroy(client, false);
 			return;
 		}
 
@@ -322,7 +321,7 @@ void ftpclient_event(struct FTPClient* client, int sock)
 			ftpclient_send_message(client, 502, false, "Command not implemented.");
 		}
 	}
-
+	else
 	if(sock == client->sock_pasv)
 	{
 		if(client->sock_data == -1)
@@ -337,16 +336,6 @@ void ftpclient_event(struct FTPClient* client, int sock)
 
 void ftpclient_disconnect(struct FTPClient* client, int sock)
 {
-	if(sock == client->sock_control)
-	{
-		// client disconnecting, remove data connections
-		ftpclient_data_end(client);
-		ftpserv_event_disconnect_call(client->server, client);
-	}
-
-	shutdown(sock, SHUT_RDWR);
-	close(sock);
-
 	nfds_t i = client->server->nfds;
 
 	while(i--)
@@ -361,6 +350,23 @@ void ftpclient_disconnect(struct FTPClient* client, int sock)
 	}
 
 	avltree_remove(client->server->clients, sock);
+
+	if(sock == client->sock_control)
+	{
+		// client disconnecting, remove data connections
+		ftpclient_data_end(client);
+		ftpserv_event_disconnect_call(client->server, client);
+
+		sock = -1;
+
+		ftpclient_destroy(client, false);
+	}
+
+	if(sock != -1)
+	{
+		shutdown(sock, SHUT_RDWR);
+		close(sock);
+	}
 }
 
 void ftpclient_destroy(struct FTPClient* client, bool freebuf)
