@@ -1,4 +1,6 @@
 TYPE ?= posix
+LIBNAME ?= ssftp_$(TYPE)
+
 TARGET = lib$(LIBNAME).a
 
 MACH := $(shell $(CC) -dumpmachine)

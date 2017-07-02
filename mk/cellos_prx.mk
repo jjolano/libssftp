@@ -1,4 +1,5 @@
 TYPE ?= cellos_prx
+LIBNAME ?= ssftp_$(TYPE)
 
 CELL_SDK ?= /usr/local/cell
 CELL_MK_DIR ?= $(CELL_SDK)/samples/mk

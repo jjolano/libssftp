@@ -1,4 +1,5 @@
 TYPE ?= psl1ght
+LIBNAME ?= ssftp_$(TYPE)
 
 include $(PSL1GHT)/ppu_rules
 
