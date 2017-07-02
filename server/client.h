@@ -7,7 +7,13 @@ extern "C" {
 #include <stdio.h>
 #include <stdbool.h>
 #include <dirent.h>
+
+#ifdef __PSL1GHT__
+#include <net/poll.h>
+#else
 #include <sys/poll.h>
+#endif
+
 #include <netinet/in.h>
 
 #ifdef __CELLOS_LV2__
@@ -19,6 +25,10 @@ extern "C" {
 #include <linux/limits.h>
 #else
 #include <limits.h>
+#endif
+
+#ifndef PATH_MAX
+#define PATH_MAX 1056
 #endif
 
 struct FTPServer;

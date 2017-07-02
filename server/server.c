@@ -1,13 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
+#ifdef __PSL1GHT__
+#include <net/poll.h>
+#define	TCP_NODELAY	0x01
+#else
 #include <sys/poll.h>
+#include <netinet/tcp.h>
+#endif
+
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netinet/tcp.h>
 #include <unistd.h>
 
 #include "server.h"
+#include "response.h"
 #include "util/array.h"
 
 array(struct pollfd, pollfd_);

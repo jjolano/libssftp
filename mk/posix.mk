@@ -1,6 +1,6 @@
 TARGET = lib$(LIBNAME).a
 
-MACH := $(shell uname -m)
+MACH := $(shell $(CC) -dumpmachine)
 
 CFILES = $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c) compat/fs/$(TYPE).c
 OFILES = $(CFILES:.c=.$(MACH).o)

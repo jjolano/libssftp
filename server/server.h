@@ -5,7 +5,13 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+
+#ifdef __PSL1GHT__
+#include <net/poll.h>
+#else
 #include <sys/poll.h>
+#endif
+
 #include <netinet/in.h>
 
 struct FTPClient;

@@ -3,13 +3,21 @@
 #include <stdbool.h>
 #include <string.h>
 #include <dirent.h>
+
+#ifdef __PSL1GHT__
+#include <net/poll.h>
+#define	TCP_NODELAY	0x01
+#else
 #include <sys/poll.h>
+#include <netinet/tcp.h>
+#endif
+
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netinet/tcp.h>
 #include <unistd.h>
 
 #include "client.h"
+#include "response.h"
 #include "compat/fs.h"
 #include "util/array.h"
 #include "util/avl.h"
@@ -318,7 +326,7 @@ void ftpclient_event(struct FTPClient* client, int sock)
 
 		if(!ftpcmd_call(client->server->commands, false, client, name, args))
 		{
-			ftpclient_send_message(client, 502, false, "Command not implemented.");
+			ftpclient_send_message(client, 502, false, FTP_502);
 		}
 	}
 	else
