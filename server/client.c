@@ -46,8 +46,9 @@ struct FTPClient* ftpclient_create(int sock, struct FTPServer* server, char* buf
 		client->sock_data = -1;
 		client->sock_pasv = -1;
 
+		client->addr = malloc(sizeof(struct sockaddr));
 		client->addrlen = sizeof(struct sockaddr);
-		getsockname(sock, &client->addr, &client->addrlen);
+		getsockname(sock, client->addr, &client->addrlen);
 
 		client->buf = buf;
 		client->bufsiz = bufsiz;
@@ -106,7 +107,7 @@ bool ftpclient_data_start(struct FTPClient* client, void (*callback)(struct FTPC
 		{
 			// no pasv listener, attempt actv mode
 			// only connect to originating point
-			struct sockaddr_in* sin_addr = (struct sockaddr_in*) &client->addr;
+			struct sockaddr_in* sin_addr = (struct sockaddr_in*) client->addr;
 			struct sockaddr_in actv_addr;
 
 			memcpy(&actv_addr, sin_addr, client->addrlen);
@@ -413,6 +414,7 @@ void ftpclient_destroy(struct FTPClient* client, bool freebuf)
 		client->handle = NULL;
 	}
 
+	free(client->addr);
 	free(client->rnfr);
 	free(client);
 }

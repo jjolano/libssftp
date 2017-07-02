@@ -1,6 +1,9 @@
+#include <time.h>
+#include <sys/stat.h>
+#include <dirent.h>
+
 #ifndef __STDC_H__
 #define __STDC_H__
-
 
 /*
 extern uint64_t stdc_1ACBEFAC;  // ? dword_747E48
@@ -376,7 +379,7 @@ extern void stdc_AF89FDBD(const char *, const char *);                          
 #define _Assert stdc_AF89FDBD
 
 extern int stdc_B120F6CA(int fd);                                                     // close()
-#define close stdc_B120F6CA
+#define _close stdc_B120F6CA
 
 extern int stdc_B1F4779D(sys_spu_thread_t id, uint32_t arg_addr);                     // spu_thread_printf()
 #define spu_thread_printf stdc_B1F4779D

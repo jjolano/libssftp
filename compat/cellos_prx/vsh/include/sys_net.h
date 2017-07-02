@@ -1,4 +1,11 @@
 // 3141card
+#include <netex/net.h>
+#include <netex/udpp2p.h>
+#include <netex/sockinfo.h>
+
+#include <sys/select.h>
+#include <sys/time.h>
+
 #ifndef __SYS_NET_H__
 #define __SYS_NET_H__
 

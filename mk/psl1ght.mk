@@ -1,3 +1,5 @@
+TYPE ?= psl1ght
+
 include $(PSL1GHT)/ppu_rules
 
 TARGET = lib$(LIBNAME).a

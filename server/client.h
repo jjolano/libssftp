@@ -46,7 +46,7 @@ struct FTPClient
 	int sock_data;
 	int sock_pasv;
 
-	struct sockaddr addr;
+	struct sockaddr* addr;
 	socklen_t addrlen;
 
 	char* buf;

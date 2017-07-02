@@ -1,3 +1,4 @@
+TYPE ?= posix
 TARGET = lib$(LIBNAME).a
 
 MACH := $(shell $(CC) -dumpmachine)

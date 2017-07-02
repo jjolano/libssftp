@@ -1,0 +1,19 @@
+TYPE ?= cellos_prx
+
+CELL_SDK ?= /usr/local/cell
+CELL_MK_DIR ?= $(CELL_SDK)/samples/mk
+
+include $(CELL_MK_DIR)/sdk.makedef.mk
+
+OBJS_DIR = $(TYPE)_objs
+
+PPU_LIB_TARGET = lib$(LIBNAME).a
+PPU_OPTIMIZE_LV = -Os
+
+PPU_CFLAGS += -Wall -ffunction-sections -fdata-sections
+PPU_SRCS := $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c) compat/fs/cellos.c
+PPU_INCDIRS += -I.
+
+PPU_CFLAGS += -D__CELLOS_PRX__
+
+include $(CELL_MK_DIR)/sdk.target.mk
