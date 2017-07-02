@@ -1,6 +1,8 @@
 TYPE ?= posix
 LIBNAME = ssftp_$(TYPE)
 
+include mk/$(TYPE).mk
+
 libs:
 	$(MAKE) TYPE=posix
 	$(MAKE) TYPE=cellos
@@ -12,5 +14,3 @@ distclean:
 	$(MAKE) TYPE=cellos clean
 	$(MAKE) TYPE=cellos_prx clean
 	$(MAKE) TYPE=psl1ght clean
-
-include mk/$(TYPE).mk
