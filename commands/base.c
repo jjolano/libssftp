@@ -37,17 +37,32 @@ define_cmd2(ssftpCmdAllo)
 
 define_cmd2(ssftpCmdCdup)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdCwd)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdDele)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdHelp)
@@ -57,12 +72,22 @@ define_cmd2(ssftpCmdHelp)
 
 define_cmd2(ssftpCmdList)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdMkd)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdMode)
@@ -80,7 +105,12 @@ define_cmd2(ssftpCmdMode)
 
 define_cmd2(ssftpCmdNlst)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdNoop)
@@ -235,22 +265,42 @@ define_cmd2(ssftpCmdRest)
 
 define_cmd2(ssftpCmdRetr)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdRmd)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdRnfr)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdRnto)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdSite)
@@ -261,6 +311,19 @@ define_cmd2(ssftpCmdSite)
 		return;
 	}
 
+	char* site_data = strdup(args);
+
+	char* site_name;
+	char* site_args;
+
+	string_parsecmd(&site_name, &site_args, site_data);
+
+	if(!ftpcmd_call(client->server->commands, true, client, site_name, site_args))
+	{
+		ftpclient_send_message(client, 502, false, FTP_502);
+	}
+
+	free(site_data);
 }
 
 define_cmd2(ssftpCmdStat)
@@ -283,7 +346,12 @@ define_cmd2(ssftpCmdStat)
 
 define_cmd2(ssftpCmdStor)
 {
-
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+	
 }
 
 define_cmd2(ssftpCmdStru)
