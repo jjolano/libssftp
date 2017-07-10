@@ -90,7 +90,7 @@ define_data2(ssftpDataNlst)
 
 define_data2(ssftpDataRetr)
 {
-	size_t nread = ssftpFsRead(client->handle, client->buf, BUFSIZ);
+	size_t nread = ssftpFsRead(client->handle, client->buf, client->server->bufsiz);
 
 	if(nread == 0)
 	{
@@ -116,7 +116,7 @@ define_data2(ssftpDataRetr)
 
 define_data2(ssftpDataStor)
 {
-	ssize_t nread = recv(client->sock_data, client->buf, BUFSIZ, 0);
+	ssize_t nread = recv(client->sock_data, client->buf, client->server->bufsiz, 0);
 
 	if(nread == 0)
 	{
