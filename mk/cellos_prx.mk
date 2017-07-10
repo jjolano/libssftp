@@ -12,7 +12,7 @@ PPU_LIB_TARGET = lib$(LIBNAME).a
 PPU_OPTIMIZE_LV = -Os
 
 PPU_CFLAGS += -Wall -ffunction-sections -fdata-sections
-PPU_SRCS := $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c) compat/fs/cellos.c
+PPU_SRCS := $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c) compat/fs/cellos.c compat/libftp.c
 PPU_INCDIRS += -I.
 
 PPU_CFLAGS += -D__CELLOS_PRX__

@@ -2,7 +2,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <libftp.h>
+
 #include <sys/ppu_thread.h>
+#include <sys/mempool.h>
+#include <sys/memory.h>
+#include <sys/prx.h>
+#include <sys/interrupt.h>
+#include <sys/spu_utility.h>
 
 #include "server/server.h"
 #include "server/client.h"
@@ -13,13 +19,18 @@
 #include <cell/sysmodule.h>
 #endif
 
-FTPServer libftp_server;
+void _cellFtpServiceEventClientConnected(struct FTPClient* client);
+void _cellFtpServiceEventClientDisconnected(struct FTPClient* client);
+void _cellFtpServiceStart(uint64_t arg);
+
+struct FTPServer libftp_server;
+struct FTPCommand libftp_commands;
 
 bool libftp_running = false;
 sys_ppu_thread_t libftp_tid = 0;
 CellFtpServiceEventHandler libftp_handler = NULL;
 
-void _cellFtpServiceEventClientConnected(FTPClient* client)
+void _cellFtpServiceEventClientConnected(struct FTPClient* client)
 {
 	if(libftp_handler != NULL)
 	{
@@ -27,7 +38,7 @@ void _cellFtpServiceEventClientConnected(FTPClient* client)
 	}
 }
 
-void _cellFtpServiceEventClientDisconnected(FTPClient* client)
+void _cellFtpServiceEventClientDisconnected(struct FTPClient* client)
 {
 	if(libftp_handler != NULL)
 	{
@@ -37,7 +48,11 @@ void _cellFtpServiceEventClientDisconnected(FTPClient* client)
 
 void _cellFtpServiceStart(uint64_t arg)
 {
-	ftpserv_create(&libftp_server, 21);
+	ftpcmd_create(&libftp_commands);
+
+	// register standard commands
+
+	ftpserv_create(&libftp_server, 21, &libftp_commands);
 
 	ftpserv_event_connect_register(&libftp_server, _cellFtpServiceEventClientConnected);
 	ftpserv_event_disconnect_register(&libftp_server, _cellFtpServiceEventClientDisconnected);
@@ -68,6 +83,7 @@ void _cellFtpServiceStart(uint64_t arg)
 	}
 
 	ftpserv_destroy(&libftp_server);
+	ftpcmd_destroy(&libftp_commands);
 
 	sys_ppu_thread_exit((uint64_t) ret);
 }
