@@ -115,7 +115,7 @@ extern int stdc_3A840AE3(char *str, size_t size, const char *fmt, ...);         
 #define snprintf stdc_3A840AE3
 
 extern int stdc_3AD203FA(double x);                                                   // lrint()
-#define lrint stdc_3AD203FA
+//#define lrint(x) stdc_3AD203FA(x)
 
 // stdc_3B5489A9  // ?
 
@@ -164,13 +164,13 @@ extern float stdc_4DDB926B(float x, float y);                                   
 #define powf stdc_4DDB926B
 
 extern wchar_t *stdc_4E72F810(const wchar_t *s, wchar_t c, size_t n);                 // wmemchr()
-#define wmemchr stdc_4E72F810;
+#define wmemchr(s,c,n) stdc_4E72F810(s,c,n)
 
 extern int stdc_4FFBA189(FILE *stream);                                               // feof()
 #define feof stdc_4FFBA189
 
 extern double stdc_519EBB77(double x);                                                // floor()
-#define floor stdc_519EBB77
+#define floor(x) stdc_519EBB77(x)
 
 extern size_t stdc_526A496A(int fildes, const void *buf, size_t nbytes);              // write()
 #define write stdc_526A496A
@@ -271,7 +271,7 @@ extern int stdc_814D8CB0(FILE * stream);                                        
 #define fflush stdc_814D8CB0
 
 extern wchar_t *stdc_82A3CC30(wchar_t* ws, wchar_t wc);                               // wcschr()
-#define wcschr stdc_82A3CC30
+//#define wcschr(s,c) stdc_82A3CC30(s,c)
 
 // stdc_82A4561A  // _put_fd()
 
@@ -282,7 +282,7 @@ extern wchar_t *stdc_84378DDC(wchar_t *dest, const wchar_t *src, size_t num);   
 #define wcsncpy stdc_84378DDC
 
 extern double stdc_8451EDF0(double x);                                                // sqrtf()
-#define sqrtf stdc_8451EDF0
+//#define sqrtf(x) stdc_8451EDF0(x)
 
 extern unsigned long stdc_867275D7(const char *a, char **b, int x);                   // _Stoul()
 #define _Stoul stdc_867275D7
@@ -344,7 +344,7 @@ extern double stdc_A713F8CF(double x, double* intpart);                         
 #define modf stdc_A713F8CF
 
 extern wchar_t *stdc_A797790F(wchar_t* wcs1, const wchar_t* wcs2);                    // wcsstr()
-#define wcsstr stdc_A797790F
+//#define wcsstr(a,b) stdc_A797790F(a,b)
 
 extern wchar_t *stdc_A8B07F1B(wchar_t *dest, const wchar_t *src, size_t num);         // wmemcpy()
 #define wmemcpy stdc_A8B07F1B

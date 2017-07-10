@@ -27,9 +27,7 @@ array(ftpclient_event_disconnect, disconnect_);
 #endif
 
 #ifdef __CELLOS_PRX__
-#include "compat/cellos_prx/vsh/include/allocator.h"
-#include "compat/cellos_prx/vsh/include/stdc.h"
-#include "compat/cellos_prx/vsh/include/sys_net.h"
+#include "compat/cellos_prx/vsh_exports.h"
 #endif
 
 int ftpserv_create(struct FTPServer* server, unsigned short port, struct FTPCommand* command)

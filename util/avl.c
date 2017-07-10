@@ -2,8 +2,7 @@
 #include "avl.h"
 
 #ifdef __CELLOS_PRX__
-#include "compat/cellos_prx/vsh/include/allocator.h"
-#include "compat/cellos_prx/vsh/include/stdc.h"
+#include "compat/cellos_prx/vsh_exports.h"
 #endif
 
 struct AVLTree* avltree_create(void)
