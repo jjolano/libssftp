@@ -18,9 +18,9 @@
 #include "response.h"
 #include "util/array.h"
 
-array(struct pollfd, pollfd_);
-array(ftpclient_event_connect, connect_);
-array(ftpclient_event_disconnect, disconnect_);
+define_array(struct pollfd, pollfd_);
+define_array(ftpclient_event_connect, connect_);
+define_array(ftpclient_event_disconnect, disconnect_);
 
 #ifdef __CELLOS_LV2__
 #include "compat/cellos_lv2.h"

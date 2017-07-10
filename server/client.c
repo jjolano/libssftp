@@ -22,7 +22,7 @@
 #include "util/array.h"
 #include "util/avl.h"
 
-array(struct pollfd, pollfd_);
+define_array(struct pollfd, pollfd_);
 
 #ifdef __CELLOS_LV2__
 #include "compat/cellos_lv2.h"
