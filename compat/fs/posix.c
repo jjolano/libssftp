@@ -42,11 +42,18 @@ struct FTPFileHandle* __attribute__((weak)) ssftpFsOpen(const char* path, int of
 		fp = fopen(path, "rb+");
 	}
 
+	if(fp == NULL)
+	{
+		free(ret);
+		return NULL;
+	}
+
 	ret->_hptr = fp;
 	ret->_fd = fileno(fp);
 
 	//fchmod(ret->_fd, mode);
-	chmod(path, mode);
+	//chmod(path, mode);
+	ssftpFsChmod(path, mode);
 
 	return ret;
 }
@@ -95,6 +102,12 @@ struct FTPFileHandle* __attribute__((weak)) ssftpFsOpendir(const char* path)
 	ret->_dir = true;
 
 	DIR* dirp = opendir(path);
+
+	if(dirp == NULL)
+	{
+		free(ret);
+		return NULL;
+	}
 
 	ret->_hptr = dirp;
 	ret->_fd = -1;
@@ -179,7 +192,7 @@ int __attribute__((weak)) ssftpFsChmod(const char* path, mode_t mode)
 	return chmod(path, mode);
 }
 
-int __attribute__((weak)) ssftpFsLseek(struct FTPFileHandle* handle, off_t offset, int whence)
+off_t __attribute__((weak)) ssftpFsLseek(struct FTPFileHandle* handle, off_t offset, int whence)
 {
 	off_t ret = -1;
 

@@ -7,6 +7,7 @@ extern "C" {
 #include <stdbool.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -17,7 +18,8 @@ struct FTPFileHandle
 	bool _dir;
 
 	// unused in vanilla server
-	unsigned short flags;
+	unsigned short _flags;
+	uint32_t _data;
 };
 
 struct FTPFileHandle* ssftpFsOpen(const char* path, int oflags, mode_t mode);
@@ -42,7 +44,7 @@ int ssftpFsFtruncate(struct FTPFileHandle* handle, off_t length);
 
 int ssftpFsChmod(const char* path, mode_t mode);
 
-int ssftpFsLseek(struct FTPFileHandle* handle, off_t offset, int whence);
+off_t ssftpFsLseek(struct FTPFileHandle* handle, off_t offset, int whence);
 
 #ifdef __cplusplus
 }
