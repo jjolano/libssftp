@@ -60,7 +60,7 @@ struct FTPClient
 	char cwd[PATH_MAX];
 	char username[32];
 	off_t rest;
-	char* rnfr;
+	char rnfr[PATH_MAX];
 	unsigned short actv;
 	bool authorized;
 
@@ -81,6 +81,9 @@ void ftpclient_event(struct FTPClient*, int);
 
 void ftpclient_disconnect(struct FTPClient*, int);
 void ftpclient_destroy(struct FTPClient*, bool);
+
+void string_getmode(char mode[11], struct stat* st);
+void string_getpath(char*, const char*, const char*);
 
 #ifdef __cplusplus
 }

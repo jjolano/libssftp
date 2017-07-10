@@ -1,4 +1,5 @@
 #include "base.h"
+#include "base_data.h"
 
 define_cmd2(ssftpCmdAbor)
 {
@@ -43,6 +44,19 @@ define_cmd2(ssftpCmdCdup)
 		return;
 	}
 	
+	char* last = strrchr(client->cwd, '/');
+
+	if(last == client->cwd)
+	{
+		last++;
+	}
+
+	do
+	{
+		*last = '\0';
+	} while(*(++last) != '\0');
+
+	ftpclient_send_message(client, 250, false, FTP_250);
 }
 
 define_cmd2(ssftpCmdCwd)
@@ -52,7 +66,26 @@ define_cmd2(ssftpCmdCwd)
 		ftpclient_send_message(client, 530, false, FTP_530);
 		return;
 	}
+
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
 	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	struct stat st;
+	if(ssftpFsStat(path, &st) == 0 && (st.st_mode & S_IFMT) == S_IFDIR)
+	{
+		strcpy(client->cwd, path);
+		ftpclient_send_message(client, 250, false, FTP_250);
+	}
+	else
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+	}
 }
 
 define_cmd2(ssftpCmdDele)
@@ -62,7 +95,24 @@ define_cmd2(ssftpCmdDele)
 		ftpclient_send_message(client, 530, false, FTP_530);
 		return;
 	}
+
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
 	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	if(ssftpFsUnlink(path) == 0)
+	{
+		ftpclient_send_message(client, 250, false, FTP_250);
+	}
+	else
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+	}
 }
 
 define_cmd2(ssftpCmdHelp)
@@ -78,6 +128,31 @@ define_cmd2(ssftpCmdList)
 		return;
 	}
 	
+	if(client->handle != NULL)
+	{
+		ftpclient_send_message(client, 450, false, FTP_450);
+		return;
+	}
+
+	client->handle = ssftpFsOpendir(client->cwd);
+
+	if(client->handle == NULL)
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+		return;
+	}
+
+	if(ftpclient_data_start(client, ssftpDataList, true))
+	{
+		ftpclient_send_message(client, 150, false, FTP_150);
+	}
+	else
+	{
+		ssftpFsClosedir(client->handle);
+		client->handle = NULL;
+
+		ftpclient_send_message(client, 425, false, FTP_425);
+	}
 }
 
 define_cmd2(ssftpCmdMkd)
@@ -88,6 +163,26 @@ define_cmd2(ssftpCmdMkd)
 		return;
 	}
 	
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
+	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	if(ssftpFsMkdir(path, 0777) == 0)
+	{
+		char buf[PATH_MAX + 32];
+		sprintf(buf, FTP_257, path);
+
+		ftpclient_send_message(client, 257, false, buf);
+	}
+	else
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+	}
 }
 
 define_cmd2(ssftpCmdMode)
@@ -98,7 +193,21 @@ define_cmd2(ssftpCmdMode)
 		return;
 	}
 
-	client->mode = args[0];
+	char mode = args[0];
+
+	if(mode >= 'a' && mode <= 'z')
+	{
+		mode -= 32;
+	}
+
+	// only stream is supported
+	if(mode != 'S')
+	{
+		ftpclient_send_message(client, 504, false, FTP_504);
+		return;
+	}
+
+	client->mode = mode;
 
 	ftpclient_send_message(client, 200, false, FTP_200);
 }
@@ -111,6 +220,31 @@ define_cmd2(ssftpCmdNlst)
 		return;
 	}
 	
+	if(client->handle != NULL)
+	{
+		ftpclient_send_message(client, 450, false, FTP_450);
+		return;
+	}
+
+	client->handle = ssftpFsOpendir(client->cwd);
+
+	if(client->handle == NULL)
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+		return;
+	}
+
+	if(ftpclient_data_start(client, ssftpDataNlst, true))
+	{
+		ftpclient_send_message(client, 150, false, FTP_150);
+	}
+	else
+	{
+		ssftpFsClosedir(client->handle);
+		client->handle = NULL;
+
+		ftpclient_send_message(client, 425, false, FTP_425);
+	}
 }
 
 define_cmd2(ssftpCmdNoop)
@@ -126,7 +260,7 @@ define_cmd2(ssftpCmdPass)
 		return;
 	}
 
-	if(args[0] == '\0')
+	if(args == NULL)
 	{
 		ftpclient_send_message(client, 501, false, FTP_501);
 		return;
@@ -271,6 +405,43 @@ define_cmd2(ssftpCmdRetr)
 		return;
 	}
 	
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
+
+	if(client->handle != NULL)
+	{
+		ftpclient_send_message(client, 450, false, FTP_450);
+		return;
+	}
+	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	client->handle = ssftpFsOpen(path, O_RDONLY, 0777);
+
+	if(client->handle == NULL)
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+		return;
+	}
+
+	ssftpFsLseek(client->handle, client->rest, SEEK_SET);
+	client->rest = 0;
+
+	if(ftpclient_data_start(client, ssftpDataRetr, true))
+	{
+		ftpclient_send_message(client, 150, false, FTP_150);
+	}
+	else
+	{
+		ssftpFsClose(client->handle);
+		client->handle = NULL;
+
+		ftpclient_send_message(client, 425, false, FTP_425);
+	}
 }
 
 define_cmd2(ssftpCmdRmd)
@@ -281,6 +452,23 @@ define_cmd2(ssftpCmdRmd)
 		return;
 	}
 	
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
+	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	if(ssftpFsRmdir(path) == 0)
+	{
+		ftpclient_send_message(client, 250, false, FTP_250);
+	}
+	else
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+	}
 }
 
 define_cmd2(ssftpCmdRnfr)
@@ -291,6 +479,26 @@ define_cmd2(ssftpCmdRnfr)
 		return;
 	}
 	
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
+	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	struct stat st;
+	if(ssftpFsStat(path, &st) == 0)
+	{
+		strcpy(client->rnfr, path);
+
+		ftpclient_send_message(client, 350, false, FTP_350A);
+	}
+	else
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+	}
 }
 
 define_cmd2(ssftpCmdRnto)
@@ -301,11 +509,30 @@ define_cmd2(ssftpCmdRnto)
 		return;
 	}
 	
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
+	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	if(ssftpFsRename(client->rnfr, path) == 0)
+	{
+		ftpclient_send_message(client, 250, false, FTP_250);
+	}
+	else
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+	}
+
+	client->rnfr[0] = '\0';
 }
 
 define_cmd2(ssftpCmdSite)
 {
-	if(args[0] == '\0')
+	if(args == NULL)
 	{
 		ftpclient_send_message(client, 501, false, FTP_501);
 		return;
@@ -317,6 +544,7 @@ define_cmd2(ssftpCmdSite)
 	char* site_args;
 
 	string_parsecmd(&site_name, &site_args, site_data);
+	string_toupper(site_name);
 
 	if(!ftpcmd_call(client->server->commands, true, client, site_name, site_args))
 	{
@@ -352,6 +580,63 @@ define_cmd2(ssftpCmdStor)
 		return;
 	}
 	
+	if(args == NULL)
+	{
+		ftpclient_send_message(client, 501, false, FTP_501);
+		return;
+	}
+	
+	if(client->handle != NULL)
+	{
+		ftpclient_send_message(client, 450, false, FTP_450);
+		return;
+	}
+	
+	char path[PATH_MAX];
+	string_getpath(path, client->cwd, args);
+
+	int oflags = O_WRONLY;
+
+	struct stat st;
+	if(ssftpFsStat(path, &st) != 0)
+	{
+		oflags |= O_CREAT;
+	}
+
+	if(strcmp(cmd, "APPE") == 0)
+	{
+		oflags |= O_APPEND;
+	}
+	else
+	{
+		if(client->rest == 0)
+		{
+			oflags |= O_TRUNC;
+		}
+	}
+
+	client->handle = ssftpFsOpen(path, oflags, 0777);
+
+	if(client->handle == NULL)
+	{
+		ftpclient_send_message(client, 550, false, FTP_550);
+		return;
+	}
+
+	ssftpFsLseek(client->handle, client->rest, SEEK_SET);
+	client->rest = 0;
+
+	if(ftpclient_data_start(client, ssftpDataStor, false))
+	{
+		ftpclient_send_message(client, 150, false, FTP_150);
+	}
+	else
+	{
+		ssftpFsClose(client->handle);
+		client->handle = NULL;
+
+		ftpclient_send_message(client, 425, false, FTP_425);
+	}
 }
 
 define_cmd2(ssftpCmdStru)
@@ -362,7 +647,21 @@ define_cmd2(ssftpCmdStru)
 		return;
 	}
 
-	client->stru = args[0];
+	char stru = args[0];
+
+	if(stru >= 'a' && stru <= 'z')
+	{
+		stru -= 32;
+	}
+
+	// only file is supported
+	if(stru != 'F')
+	{
+		ftpclient_send_message(client, 504, false, FTP_504);
+		return;
+	}
+
+	client->stru = stru;
 
 	ftpclient_send_message(client, 200, false, FTP_200);
 }
@@ -380,7 +679,21 @@ define_cmd2(ssftpCmdType)
 		return;
 	}
 
-	client->type = args[0];
+	char type = args[0];
+
+	if(type >= 'a' && type <= 'z')
+	{
+		type -= 32;
+	}
+
+	// only binary is supported
+	if(type != 'I')
+	{
+		ftpclient_send_message(client, 504, false, FTP_504);
+		return;
+	}
+
+	client->type = type;
 
 	ftpclient_send_message(client, 200, false, FTP_200);
 }
@@ -393,7 +706,7 @@ define_cmd2(ssftpCmdUser)
 		return;
 	}
 
-	if(args[0] == '\0')
+	if(args == NULL)
 	{
 		ftpclient_send_message(client, 501, false, FTP_501);
 		return;

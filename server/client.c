@@ -60,9 +60,13 @@ struct FTPClient* ftpclient_create(int sock, struct FTPServer* server, char* buf
 		strcpy(client->cwd, "/");
 		client->username[0] = '\0';
 		client->rest = 0;
-		client->rnfr = NULL;
+		client->rnfr[0] = '\0';
 		client->actv = 20;
 		client->authorized = false;
+
+		client->mode = 'S'; // S = stream, B = block, C = compressed
+		client->stru = 'F'; // F = file, R = record, P = page
+		client->type = 'I'; // I = binary, A = ASCII, E = EBCDIC, L <byte size> = custom
 
 		ftpserv_event_connect_call(server, client);
 	}
@@ -324,6 +328,7 @@ void ftpclient_event(struct FTPClient* client, int sock)
 		char* args;
 
 		string_parsecmd(&name, &args, client->buf);
+		string_toupper(name);
 
 		if(!ftpcmd_call(client->server->commands, false, client, name, args))
 		{
@@ -415,6 +420,63 @@ void ftpclient_destroy(struct FTPClient* client, bool freebuf)
 	}
 
 	free(client->addr);
-	free(client->rnfr);
 	free(client);
+}
+
+void string_getpath(char* dst, const char* abspath, const char* relpath)
+{
+	dst[0] = '\0';
+
+	if(relpath[0] == '/')
+	{
+		strcpy(dst, relpath);
+	}
+	else
+	{
+		strcpy(dst, abspath);
+		strcat(dst, "/");
+		strcat(dst, relpath);
+	}
+
+	// remove trailing slash
+	if(strlen(dst) > 1)
+	{
+		char* last = strrchr(relpath, '/');
+
+		if(last != NULL && *(last - 1) == '\0')
+		{
+			*last = '\0';
+		}
+	}
+}
+
+void string_getmode(char mode[11], struct stat* st)
+{
+	mode[0] = '?';
+
+	if((st->st_mode & S_IFMT) == S_IFDIR)
+	{
+		mode[0] = 'd';
+	}
+
+	if((st->st_mode & S_IFMT) == S_IFREG)
+	{
+		mode[0] = '-';
+	}
+	
+	if((st->st_mode & S_IFMT) == S_IFLNK)
+	{
+		mode[0] = 'l';
+	}
+
+	mode[1] = ((st->st_mode & S_IRUSR) ? 'r' : '-');
+	mode[2] = ((st->st_mode & S_IWUSR) ? 'w' : '-');
+	mode[3] = ((st->st_mode & S_IXUSR) ? 'x' : '-');
+	mode[4] = ((st->st_mode & S_IRGRP) ? 'r' : '-');
+	mode[5] = ((st->st_mode & S_IWGRP) ? 'w' : '-');
+	mode[6] = ((st->st_mode & S_IXGRP) ? 'x' : '-');
+	mode[7] = ((st->st_mode & S_IROTH) ? 'r' : '-');
+	mode[8] = ((st->st_mode & S_IWOTH) ? 'w' : '-');
+	mode[9] = ((st->st_mode & S_IXOTH) ? 'x' : '-');
+	mode[10] = '\0';
 }

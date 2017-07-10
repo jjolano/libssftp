@@ -70,22 +70,19 @@ void ftpcmd_destroy(struct FTPCommand* command)
 	command->secondary_commands = NULL;
 }
 
-void string_toupper(char* dst, const char* src)
+void string_toupper(char* dst)
 {
-	size_t c = 0;
- 
-	do {
-		if(src[c] >= 'a' && src[c] <= 'z')
-		{
-			dst[c] = (src[c] - 32);
-		}
-		else
-		{
-			dst[c] = src[c];
-		}
-	} while(src[c++] != '\0');
+	char c;
 
-	dst[c] = '\0';
+	while((c = *dst) != '\0')
+	{
+		if(c >= 'a' && c <= 'z')
+		{
+			*dst -= 32;
+		}
+
+		++dst;
+	}
 }
 
 void string_parsecmd(char** name, char** args, char* src)

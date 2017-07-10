@@ -5,6 +5,9 @@
 #include "server/cmd.h"
 
 #include "commands/base.h"
+#include "commands/ext.h"
+#include "commands/feat.h"
+#include "commands/site.h"
 
 void client_connect(struct FTPClient* client)
 {
@@ -53,6 +56,17 @@ int main(void)
 	register_cmd(&commands, "SYST", ssftpCmdSyst);
 	register_cmd(&commands, "TYPE", ssftpCmdType);
 	register_cmd(&commands, "USER", ssftpCmdUser);
+
+	// ext
+	register_cmd(&commands, "SIZE", ssftpCmdSize);
+	register_cmd(&commands, "MDTM", ssftpCmdMdtm);
+
+	// feat
+	register_cmd(&commands, "FEAT", ssftpCmdFeat);
+
+	// site
+	register_cmd2(&commands, "CHMOD", ssftpCmdChmod);
+	register_cmd2(&commands, "STOP", ssftpCmdStop);
 
 	ftpserv_create(&server, 21, &commands);
 

@@ -254,14 +254,9 @@ int ftpserv_run(struct FTPServer* server)
 
 		ftpclient_send_message(client, 421, false, "Server is shutting down.");
 		ftpclient_disconnect(client, client->sock_control);
-
-		avltree_remove(server->clients, server->clients->root->key);
 	}
 
-	ftpserv_destroy(server);
-
 	server->run = false;
-
 	return ret;
 }
 
