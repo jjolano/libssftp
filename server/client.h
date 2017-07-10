@@ -80,7 +80,7 @@ bool ftpclient_data_pasv(struct FTPClient*);
 void ftpclient_event(struct FTPClient*, int);
 
 void ftpclient_disconnect(struct FTPClient*, int);
-void ftpclient_destroy(struct FTPClient*, bool);
+void ftpclient_destroy(struct FTPClient*);
 
 void string_getmode(char mode[11], struct stat* st);
 void string_getpath(char*, const char*, const char*);

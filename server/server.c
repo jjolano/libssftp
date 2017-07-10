@@ -129,6 +129,11 @@ int ftpserv_run(struct FTPServer* server)
 		{
 			struct pollfd* pfd = &server->fds[i];
 
+			if(pfd == NULL)
+			{
+				continue;
+			}
+
 			if(pfd->revents)
 			{
 				// handle event
@@ -178,7 +183,7 @@ int ftpserv_run(struct FTPServer* server)
 							// cannot allocate memory
 							ftpclient_send_message(client, 421, false, "Failed to allocate memory for event polling.");
 
-							ftpclient_destroy(client, false);
+							ftpclient_destroy(client);
 							close(sock);
 							continue;
 						}

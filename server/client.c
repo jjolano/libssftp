@@ -162,12 +162,6 @@ bool ftpclient_data_start(struct FTPClient* client, void (*callback)(struct FTPC
 			}
 		}
 	}
-	
-	// prevent malicious command usage
-	if(client->data_callback != NULL)
-	{
-		return false;
-	}
 
 	int optval = 1;
 	setsockopt(client->sock_data, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
@@ -207,33 +201,33 @@ bool ftpclient_data_start(struct FTPClient* client, void (*callback)(struct FTPC
 
 void ftpclient_data_end(struct FTPClient* client)
 {
-	if(client->sock_data != -1)
+	if(client->handle != NULL)
 	{
-		if(client->handle != NULL)
+		if(client->handle->_dir)
 		{
-			if(client->handle->_dir)
-			{
-				ssftpFsClosedir(client->handle);
-			}
-			else
-			{
-				ssftpFsClose(client->handle);
-			}
-
-			client->handle = NULL;
+			ssftpFsClosedir(client->handle);
+		}
+		else
+		{
+			ssftpFsClose(client->handle);
 		}
 
-		ftpclient_disconnect(client, client->sock_data);
+		client->handle = NULL;
+	}
 
+	if(client->sock_data != -1)
+	{
+		ftpclient_disconnect(client, client->sock_data);
 		client->sock_data = -1;
-		client->data_callback = NULL;
 	}
 
 	if(client->sock_pasv != -1)
 	{
-		close(client->sock_pasv);
+		ftpclient_disconnect(client, client->sock_pasv);
 		client->sock_pasv = -1;
 	}
+
+	client->data_callback = NULL;
 }
 
 bool ftpclient_data_pasv(struct FTPClient* client)
@@ -370,10 +364,9 @@ void ftpclient_disconnect(struct FTPClient* client, int sock)
 		// client disconnecting, remove data connections
 		ftpclient_data_end(client);
 		ftpserv_event_disconnect_call(client->server, client);
+		ftpclient_destroy(client);
 
 		sock = -1;
-
-		ftpclient_destroy(client, false);
 	}
 
 	if(sock != -1)
@@ -383,7 +376,7 @@ void ftpclient_disconnect(struct FTPClient* client, int sock)
 	}
 }
 
-void ftpclient_destroy(struct FTPClient* client, bool freebuf)
+void ftpclient_destroy(struct FTPClient* client)
 {
 	if(client->sock_control != -1)
 	{
@@ -400,7 +393,7 @@ void ftpclient_destroy(struct FTPClient* client, bool freebuf)
 		close(client->sock_pasv);
 	}
 
-	if(freebuf)
+	if(client->buf != client->server->buf)
 	{
 		free(client->buf);
 	}

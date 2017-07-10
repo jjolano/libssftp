@@ -9,11 +9,8 @@ define_data2(ssftpDataList)
 	struct dirent entry;
 	if(ssftpFsReaddir(client->handle, &entry) == NULL)
 	{
-		ssftpFsClosedir(client->handle);
-		client->handle = NULL;
-
-		ftpclient_send_message(client, 226, false, FTP_226);
 		ftpclient_data_end(client);
+		ftpclient_send_message(client, 226, false, FTP_226);
 		return;
 	}
 
@@ -46,11 +43,8 @@ define_data2(ssftpDataList)
 
 		if(sent == -1 || sent < len)
 		{
-			ssftpFsClosedir(client->handle);
-			client->handle = NULL;
-
-			ftpclient_send_message(client, 451, false, FTP_451);
 			ftpclient_data_end(client);
+			ftpclient_send_message(client, 451, false, FTP_451);
 		}
 	}
 }
@@ -60,11 +54,8 @@ define_data2(ssftpDataNlst)
 	struct dirent entry;
 	if(ssftpFsReaddir(client->handle, &entry) == NULL)
 	{
-		ssftpFsClosedir(client->handle);
-		client->handle = NULL;
-
-		ftpclient_send_message(client, 226, false, FTP_226);
 		ftpclient_data_end(client);
+		ftpclient_send_message(client, 226, false, FTP_226);
 		return;
 	}
 
@@ -79,11 +70,8 @@ define_data2(ssftpDataNlst)
 
 		if(sent == -1 || sent < len)
 		{
-			ssftpFsClosedir(client->handle);
-			client->handle = NULL;
-
-			ftpclient_send_message(client, 451, false, FTP_451);
 			ftpclient_data_end(client);
+			ftpclient_send_message(client, 451, false, FTP_451);
 		}
 	}
 }
@@ -94,11 +82,8 @@ define_data2(ssftpDataRetr)
 
 	if(nread == 0)
 	{
-		ssftpFsClose(client->handle);
-		client->handle = NULL;
-
-		ftpclient_send_message(client, 226, false, FTP_226);
 		ftpclient_data_end(client);
+		ftpclient_send_message(client, 226, false, FTP_226);
 		return;
 	}
 
@@ -106,11 +91,8 @@ define_data2(ssftpDataRetr)
 
 	if(sent == -1 || sent < nread)
 	{
-		ssftpFsClose(client->handle);
-		client->handle = NULL;
-
-		ftpclient_send_message(client, 451, false, FTP_451);
 		ftpclient_data_end(client);
+		ftpclient_send_message(client, 451, false, FTP_451);
 	}
 }
 
@@ -120,21 +102,15 @@ define_data2(ssftpDataStor)
 
 	if(nread == 0)
 	{
-		ssftpFsClose(client->handle);
-		client->handle = NULL;
-
-		ftpclient_send_message(client, 226, false, FTP_226);
 		ftpclient_data_end(client);
+		ftpclient_send_message(client, 226, false, FTP_226);
 		return;
 	}
 
 	if(nread == -1)
 	{
-		ssftpFsClose(client->handle);
-		client->handle = NULL;
-
-		ftpclient_send_message(client, 451, false, FTP_451);
 		ftpclient_data_end(client);
+		ftpclient_send_message(client, 451, false, FTP_451);
 		return;
 	}
 
@@ -142,10 +118,7 @@ define_data2(ssftpDataStor)
 
 	if(written < nread)
 	{
-		ssftpFsClose(client->handle);
-		client->handle = NULL;
-
-		ftpclient_send_message(client, 452, false, FTP_452);
 		ftpclient_data_end(client);
+		ftpclient_send_message(client, 452, false, FTP_452);
 	}
 }

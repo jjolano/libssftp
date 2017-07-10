@@ -148,9 +148,7 @@ define_cmd2(ssftpCmdList)
 	}
 	else
 	{
-		ssftpFsClosedir(client->handle);
-		client->handle = NULL;
-
+		ftpclient_data_end(client);
 		ftpclient_send_message(client, 425, false, FTP_425);
 	}
 }
@@ -240,9 +238,7 @@ define_cmd2(ssftpCmdNlst)
 	}
 	else
 	{
-		ssftpFsClosedir(client->handle);
-		client->handle = NULL;
-
+		ftpclient_data_end(client);
 		ftpclient_send_message(client, 425, false, FTP_425);
 	}
 }
@@ -309,6 +305,7 @@ define_cmd2(ssftpCmdPasv)
 	}
 	else
 	{
+		ftpclient_data_end(client);
 		ftpclient_send_message(client, 425, false, FTP_425);
 	}
 }
@@ -437,9 +434,7 @@ define_cmd2(ssftpCmdRetr)
 	}
 	else
 	{
-		ssftpFsClose(client->handle);
-		client->handle = NULL;
-
+		ftpclient_data_end(client);
 		ftpclient_send_message(client, 425, false, FTP_425);
 	}
 }
@@ -632,9 +627,7 @@ define_cmd2(ssftpCmdStor)
 	}
 	else
 	{
-		ssftpFsClose(client->handle);
-		client->handle = NULL;
-
+		ftpclient_data_end(client);
 		ftpclient_send_message(client, 425, false, FTP_425);
 	}
 }
@@ -687,11 +680,11 @@ define_cmd2(ssftpCmdType)
 	}
 
 	// only binary is supported
-	if(type != 'I')
+	/*if(type != 'I')
 	{
 		ftpclient_send_message(client, 504, false, FTP_504);
 		return;
-	}
+	}*/
 
 	client->type = type;
 

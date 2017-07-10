@@ -30,6 +30,7 @@ int main(void)
 	register_cmd(&commands, "ABOR", ssftpCmdAbor);
 	register_cmd(&commands, "ACCT", ssftpCmdAcct);
 	register_cmd(&commands, "ALLO", ssftpCmdAllo);
+	register_cmd(&commands, "APPE", ssftpCmdStor);
 	register_cmd(&commands, "CDUP", ssftpCmdCdup);
 	register_cmd(&commands, "CWD", ssftpCmdCwd);
 	register_cmd(&commands, "DELE", ssftpCmdDele);
