@@ -30,3 +30,8 @@ void string_parsecmd(char**, char**, char*);
 #ifdef __cplusplus
 }
 #endif
+
+#define define_cmd(name) void name(struct FTPClient* client, const char* name, const char* args)
+#define define_cmd2(name) void __attribute__((weak)) name(struct FTPClient* client, const char* name, const char* args)
+#define register_cmd(commands, name, callback) ftpcmd_register(commands, false, name, callback)
+#define register_cmd2(commands, name, callback) ftpcmd_register(commands, true, name, callback)

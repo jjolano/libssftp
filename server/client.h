@@ -63,6 +63,10 @@ struct FTPClient
 	char* rnfr;
 	unsigned short actv;
 	bool authorized;
+
+	char mode;
+	char stru;
+	char type;
 };
 
 struct FTPClient* ftpclient_create(int, struct FTPServer*, char*, int);
