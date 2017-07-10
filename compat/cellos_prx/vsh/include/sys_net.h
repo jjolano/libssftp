@@ -5,6 +5,7 @@
 
 #include <sys/select.h>
 #include <sys/time.h>
+#include <sys/socket.h>
 
 #ifndef __SYS_NET_H__
 #define __SYS_NET_H__

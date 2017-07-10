@@ -1,5 +1,7 @@
 #include <time.h>
 #include <inttypes.h>
+#include <sys/socket.h>
+
 #include "base_data.h"
 
 define_data2(ssftpDataList)
@@ -36,8 +38,8 @@ define_data2(ssftpDataList)
 		strftime(tstr, 15, useyear ? "%b %e  %Y" : "%b %e %H:%M", modtime);
 
 		int len = sprintf(client->buf,
-			"%s %3lu %-10d %-10d %10jd %s %s\r\n",
-			mode, st.st_ino, st.st_uid, st.st_gid, (uintmax_t) st.st_size, tstr, entry.d_name
+			"%s %3d %-10d %-10d %10jd %s %s\r\n",
+			mode, (int) st.st_ino, st.st_uid, st.st_gid, (uintmax_t) st.st_size, tstr, entry.d_name
 		);
 
 		ssize_t sent = send(client->sock_data, client->buf, (size_t) len, 0);
