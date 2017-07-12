@@ -114,11 +114,14 @@ define_data2(ssftpDataStor)
 		return;
 	}
 
-	size_t written = ssftpFsWrite(client->handle, client->buf, nread);
-
-	if(written < nread)
+	if(client->write_enabled)
 	{
-		ftpclient_data_end(client);
-		ftpclient_send_message(client, 452, false, FTP_452);
+		size_t written = ssftpFsWrite(client->handle, client->buf, nread);
+
+		if(written < nread)
+		{
+			ftpclient_data_end(client);
+			ftpclient_send_message(client, 452, false, FTP_452);
+		}
 	}
 }

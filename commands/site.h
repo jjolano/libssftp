@@ -22,6 +22,7 @@ extern "C" {
 
 define_cmd(ssftpCmdChmod);
 define_cmd(ssftpCmdStop);
+define_cmd(ssftpCmdWrite);
 
 #ifdef __cplusplus
 }

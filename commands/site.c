@@ -60,3 +60,16 @@ define_cmd2(ssftpCmdStop)
 	
 	ftpserv_stop(client->server);
 }
+
+define_cmd2(ssftpCmdWrite)
+{
+	if(!client->authorized)
+	{
+		ftpclient_send_message(client, 530, false, FTP_530);
+		return;
+	}
+
+	client->write_enabled = !client->write_enabled;
+
+	ftpclient_send_message(client, 200, false, client->write_enabled ? "Writes are now enabled." : "Writes are now disabled.");
+}

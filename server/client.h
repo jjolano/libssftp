@@ -63,6 +63,7 @@ struct FTPClient
 	char rnfr[PATH_MAX];
 	unsigned short actv;
 	bool authorized;
+	bool write_enabled;
 
 	char mode;
 	char stru;

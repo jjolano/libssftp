@@ -61,6 +61,7 @@ struct FTPClient* ftpclient_create(int sock, struct FTPServer* server, char* buf
 		client->rnfr[0] = '\0';
 		client->actv = 20;
 		client->authorized = false;
+		client->write_enabled = true;
 
 		client->mode = 'S'; // S = stream, B = block, C = compressed
 		client->stru = 'F'; // F = file, R = record, P = page

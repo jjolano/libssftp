@@ -68,6 +68,7 @@ int main(void)
 	// site
 	register_cmd2(&commands, "CHMOD", ssftpCmdChmod);
 	register_cmd2(&commands, "STOP", ssftpCmdStop);
+	register_cmd2(&commands, "WRITE", ssftpCmdWrite);
 
 	ftpserv_create(&server, 21, &commands);
 
