@@ -12,6 +12,12 @@
 
 #include "server/server.h"
 #include "server/client.h"
+#include "server/cmd.h"
+
+#include "commands/base.h"
+#include "commands/ext.h"
+#include "commands/feat.h"
+#include "commands/site.h"
 
 #ifdef __CELLOS_PRX__
 #include "compat/cellos_prx/vsh_exports.h"
@@ -51,6 +57,48 @@ void _cellFtpServiceStart(uint64_t arg)
 	ftpcmd_create(&libftp_commands);
 
 	// register standard commands
+	register_cmd(&libftp_commands, "ABOR", ssftpCmdAbor);
+	register_cmd(&libftp_commands, "ACCT", ssftpCmdAcct);
+	register_cmd(&libftp_commands, "ALLO", ssftpCmdAllo);
+	register_cmd(&libftp_commands, "APPE", ssftpCmdStor);
+	register_cmd(&libftp_commands, "CDUP", ssftpCmdCdup);
+	register_cmd(&libftp_commands, "CWD", ssftpCmdCwd);
+	register_cmd(&libftp_commands, "DELE", ssftpCmdDele);
+	register_cmd(&libftp_commands, "HELP", ssftpCmdHelp);
+	register_cmd(&libftp_commands, "LIST", ssftpCmdList);
+	register_cmd(&libftp_commands, "MKD", ssftpCmdMkd);
+	register_cmd(&libftp_commands, "MODE", ssftpCmdMode);
+	register_cmd(&libftp_commands, "NLST", ssftpCmdNlst);
+	register_cmd(&libftp_commands, "NOOP", ssftpCmdNoop);
+	register_cmd(&libftp_commands, "PASS", ssftpCmdPass);
+	register_cmd(&libftp_commands, "PASV", ssftpCmdPasv);
+	register_cmd(&libftp_commands, "PORT", ssftpCmdPort);
+	register_cmd(&libftp_commands, "PWD", ssftpCmdPwd);
+	register_cmd(&libftp_commands, "QUIT", ssftpCmdQuit);
+	register_cmd(&libftp_commands, "REST", ssftpCmdRest);
+	register_cmd(&libftp_commands, "RETR", ssftpCmdRetr);
+	register_cmd(&libftp_commands, "RMD", ssftpCmdRmd);
+	register_cmd(&libftp_commands, "RNFR", ssftpCmdRnfr);
+	register_cmd(&libftp_commands, "RNTO", ssftpCmdRnto);
+	register_cmd(&libftp_commands, "SITE", ssftpCmdSite);
+	register_cmd(&libftp_commands, "STAT", ssftpCmdStat);
+	register_cmd(&libftp_commands, "STOR", ssftpCmdStor);
+	register_cmd(&libftp_commands, "STRU", ssftpCmdStru);
+	register_cmd(&libftp_commands, "SYST", ssftpCmdSyst);
+	register_cmd(&libftp_commands, "TYPE", ssftpCmdType);
+	register_cmd(&libftp_commands, "USER", ssftpCmdUser);
+
+	// ext
+	register_cmd(&libftp_commands, "SIZE", ssftpCmdSize);
+	register_cmd(&libftp_commands, "MDTM", ssftpCmdMdtm);
+
+	// feat
+	register_cmd(&libftp_commands, "FEAT", ssftpCmdFeat);
+
+	// site
+	register_cmd2(&libftp_commands, "CHMOD", ssftpCmdChmod);
+	register_cmd2(&libftp_commands, "STOP", ssftpCmdStop);
+	register_cmd2(&libftp_commands, "WRITE", ssftpCmdWrite);
 
 	ftpserv_create(&libftp_server, 21, &libftp_commands);
 

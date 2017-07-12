@@ -173,7 +173,7 @@ extern double stdc_519EBB77(double x);                                          
 #define floor(x) stdc_519EBB77(x)
 
 extern size_t stdc_526A496A(int fildes, const void *buf, size_t nbytes);              // write()
-#define write stdc_526A496A
+//#define write stdc_526A496A
 
 extern void stdc_54F57626(FILE *stream);                                              // rewind()
 #define rewind stdc_54F57626
@@ -537,7 +537,7 @@ extern char *stdc_F89DC648(const char *str1, const char *str2);                 
 #define strpbrk stdc_F89DC648
 
 extern size_t stdc_FA00D211(int fd, void *buf, size_t nbytes);                        // read()
-#define read stdc_FA00D211
+//#define read stdc_FA00D211
 
 extern int stdc_FAEC8C60(FILE *stream, const char *fmt, ...);                         // fprintf()
 #define fprintf stdc_FAEC8C60
