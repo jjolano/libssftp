@@ -8,6 +8,7 @@ extern "C" {
 
 #ifdef __PSL1GHT__
 #include <net/poll.h>
+#include "compat/psl1ght.h"
 #else
 #include <sys/poll.h>
 #endif

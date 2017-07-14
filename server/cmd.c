@@ -6,8 +6,8 @@
 #include "cmd.h"
 #include "util/pt.h"
 
-#ifdef __CELLOS_PRX__
-#include "compat/cellos_prx/vsh_exports.h"
+#ifdef __CELLOS_LV2__
+#include "compat/cellos_lv2.h"
 #endif
 
 void ftpcmd_create(struct FTPCommand* command)

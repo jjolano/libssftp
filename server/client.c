@@ -6,7 +6,7 @@
 
 #ifdef __PSL1GHT__
 #include <net/poll.h>
-#define	TCP_NODELAY	0x01
+#include "compat/psl1ght.h"
 #else
 #include <sys/poll.h>
 #include <netinet/tcp.h>

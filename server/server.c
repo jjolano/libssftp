@@ -4,7 +4,7 @@
 
 #ifdef __PSL1GHT__
 #include <net/poll.h>
-#define	TCP_NODELAY	0x01
+#include "compat/psl1ght.h"
 #else
 #include <sys/poll.h>
 #include <netinet/tcp.h>
@@ -24,10 +24,6 @@ define_array(ftpclient_event_disconnect, disconnect_);
 
 #ifdef __CELLOS_LV2__
 #include "compat/cellos_lv2.h"
-#endif
-
-#ifdef __CELLOS_PRX__
-#include "compat/cellos_prx/vsh_exports.h"
 #endif
 
 int ftpserv_create(struct FTPServer* server, unsigned short port, struct FTPCommand* command)
