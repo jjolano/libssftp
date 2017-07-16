@@ -9,16 +9,7 @@ extern "C" {
 
 #include "server/cmd.h"
 #include "server/response.h"
-
-#ifdef __CELLOS_LV2__
-#include "compat/cellos_lv2.h"
-#endif
-
-#ifdef __CELLOS_PRX__
-#include "compat/cellos_prx/vsh/include/allocator.h"
-#include "compat/cellos_prx/vsh/include/stdc.h"
-#include "compat/cellos_prx/vsh/include/sys_net.h"
-#endif
+#include "compat/compat.h"
 
 define_cmd(ssftpCmdSize);
 define_cmd(ssftpCmdMdtm);
