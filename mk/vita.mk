@@ -11,7 +11,7 @@ TARGET = lib$(LIBNAME).a
 
 MACH := $(shell $(CC) -dumpmachine)
 
-CFILES = $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c) compat/fs/$(TYPE).c
+CFILES = $(wildcard util/*.c) $(wildcard server/*.c) $(wildcard commands/*.c) compat/fs/$(TYPE).c compat/selectpoll.c
 OFILES = $(CFILES:.c=.$(MACH).o)
 
 INCLUDE = -I. $(VITASDK)/include

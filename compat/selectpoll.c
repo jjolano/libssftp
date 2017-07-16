@@ -5,7 +5,7 @@
 
 int poll(struct pollfd* fds, nfds_t nfds, int timeout)
 {
-	struct timeval timeout;
+	struct timeval tv;
 	struct fd_set readset, writeset;
 
 	FD_ZERO(&readset);
@@ -25,10 +25,10 @@ int poll(struct pollfd* fds, nfds_t nfds, int timeout)
 		}
 	}
 
-	timeout.tv_sec = 0;
-	timeout.tv_usec = timeout * 1000;
+	tv.tv_sec = 0;
+	tv.tv_usec = timeout * 1000;
 
-	int s = select(nfds, &readset, &writeset, NULL, &timeout);
+	int s = select(nfds, &readset, &writeset, NULL, &tv);
 
 	for(i = 0; i < nfds; i++)
 	{
@@ -39,7 +39,7 @@ int poll(struct pollfd* fds, nfds_t nfds, int timeout)
 
 		if(fds[i].events & POLLIN)
 		{
-			if(FD_ISSET(fds[i].fd), &readset)
+			if(FD_ISSET(fds[i].fd, &readset))
 			{
 				fds[i].revents |= POLLIN;
 			}
@@ -47,7 +47,7 @@ int poll(struct pollfd* fds, nfds_t nfds, int timeout)
 
 		if(fds[i].events & POLLOUT)
 		{
-			if(FD_ISSET(fds[i].fd), &writeset)
+			if(FD_ISSET(fds[i].fd, &writeset))
 			{
 				fds[i].revents |= POLLOUT;
 			}
