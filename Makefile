@@ -9,6 +9,7 @@ libs:
 	$(MAKE) TYPE=cellos_prx
 	$(MAKE) TYPE=psl1ght
 	$(MAKE) TYPE=vita
+	$(MAKE) TYPE=psp
 
 distclean:
 	$(MAKE) TYPE=posix clean
@@ -16,3 +17,4 @@ distclean:
 	$(MAKE) TYPE=cellos_prx clean
 	$(MAKE) TYPE=psl1ght clean
 	$(MAKE) TYPE=vita clean
+	$(MAKE) TYPE=psp clean
