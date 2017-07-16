@@ -1,30 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
-#ifdef __PSL1GHT__
-#include <net/poll.h>
-#include "compat/psl1ght.h"
-#else
-#include <sys/poll.h>
-#include <netinet/tcp.h>
-#endif
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-
 #include "server.h"
 #include "response.h"
+#include "compat/compat.h"
 #include "util/array.h"
 
 define_array(struct pollfd, pollfd_);
 define_array(ftpclient_event_connect, connect_);
 define_array(ftpclient_event_disconnect, disconnect_);
-
-#ifdef __CELLOS_LV2__
-#include "compat/cellos_lv2.h"
-#endif
 
 int ftpserv_create(struct FTPServer* server, unsigned short port, struct FTPCommand* command)
 {

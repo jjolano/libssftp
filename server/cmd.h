@@ -4,11 +4,10 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
-
 struct FTPClient;
 
 #include "client.h"
+#include "compat/compat.h"
 #include "util/pt.h"
 
 typedef void (*cmd_callback)(struct FTPClient*, const char*, const char*);

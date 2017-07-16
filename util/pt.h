@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 
+#include "compat/compat.h"
+
 struct PTNode
 {
 	char key;

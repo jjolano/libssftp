@@ -4,22 +4,12 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
-
-#ifdef __PSL1GHT__
-#include <net/poll.h>
-#include "compat/psl1ght.h"
-#else
-#include <sys/poll.h>
-#endif
-
-#include <netinet/in.h>
-
 struct FTPClient;
 struct FTPCommand;
 
 #include "client.h"
 #include "cmd.h"
+#include "compat/compat.h"
 #include "util/avl.h"
 
 typedef void (*ftpclient_event_connect)(struct FTPClient*);

@@ -4,12 +4,7 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <inttypes.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include "compat/compat.h"
 
 struct FTPFileHandle
 {

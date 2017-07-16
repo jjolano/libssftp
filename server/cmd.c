@@ -1,14 +1,6 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <ctype.h>
-#include <string.h>
-
 #include "cmd.h"
+#include "compat/compat.h"
 #include "util/pt.h"
-
-#ifdef __CELLOS_LV2__
-#include "compat/cellos_lv2.h"
-#endif
 
 void ftpcmd_create(struct FTPCommand* command)
 {

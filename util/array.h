@@ -4,13 +4,7 @@
 extern "C" {
 #endif
 
-#include <stdlib.h>
-#include <string.h>
-
-#ifdef __CELLOS_PRX__
-#include "compat/cellos_prx/vsh/include/allocator.h"
-#include "compat/cellos_prx/vsh/include/stdc.h"
-#endif
+#include "compat/compat.h"
 
 #define array(type, prefix) \
 type* prefix##array_add(type** array_ptr, size_t count) \
